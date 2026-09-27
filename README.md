@@ -5,6 +5,24 @@ attests to Clamshell via TPM, gets a device certificate from a real CA
 (step-ca), seals its disk-encryption key to the TPM (real LUKS2 +
 tpm2-tools against a software TPM), and checks in with a Fleet server.
 
+# Quick Start 
+docker-compose up --build
+
+# Tech stack
+Go, Docker, Ubuntu
+swtpm, tpm2-tools, step-ca issuing authority
+iPXE for dynamic boot scripts
+cryptsetup for disk encryption on loopback image files
+
+# Reproduce the demo
+Deploy the stack to test happy path and run the scripts in side scenarios/ folder to simulate unhappy path scenarios.
+
+# Knownn limitations
+Since there is no real hardware, the swtpm is simulated. Next steps would be to test with hardware in the loop. Software TPMs have very few transient object slots without a resource manager, so contexts must be flushed between commands to prevent OOM errors.
+
+ The simulation also bypasses physical hardware features such as eMMC storage, PXE netbooting, and firmware PCR measurements.
+
+
 **Testing notes:** this sandbox has no Docker, so the full multi-container
 stack was never run via `docker compose up` here. What *was* verified
 directly, for real, against a real `swtpm` + `tpm2-tools` install (not
@@ -88,8 +106,8 @@ docker compose up --build --scale battery=5   # multiple units
 
 Then in another terminal:
 ```
-./scenarios/storm.sh battery-1          # kill power, watch it recover
-./scenarios/steal-compute.sh battery-1  # clone the TPM state, no disk, watch it get rejected
+./scenarios/storm.sh battery          # kill power, watch it recover
+./scenarios/steal-compute.sh battery  # clone the TPM state, no disk, watch it get rejected
 ./scenarios/tamper-storage.sh battery-1 # pull the disk, try to read it cold
 ./scenarios/mid-crash.sh battery-1      # kill -9 mid-provisioning, watch it resume safely
 ./scenarios/wave-rollout.sh 20          # roll a patch out to 20% of the fleet
