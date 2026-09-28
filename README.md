@@ -115,3 +115,7 @@ Then in another terminal:
 
 Everything logs to stdout per-container (`docker compose logs -f battery-1`) —
 no UI, as decided; this is meant to be read live in a terminal during a demo.
+
+
+# Recording
+https://www.loom.com/share/3fdd6ddf6a2448258071e3291e648163
